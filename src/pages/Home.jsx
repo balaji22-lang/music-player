@@ -7,6 +7,8 @@ function Home() {
   const [query, setQuery] = useState("");
   const [tracks, setTracks] = useState([]);
   const [current, setCurrent] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(-1);
+  const [isShuffle, setIsShuffle] = useState(false);
 
   // Note: Jamendo public track API doesn't require an OAuth token, just your client_id!
   // so we can bypass the login check completely.
@@ -14,6 +16,33 @@ function Home() {
   async function handleSearch() {
     const results = await searchSongs(query);
     setTracks(results);
+    setCurrentIndex(-1);
+    setCurrent(null);
+  }
+
+  function handleSelectTrack(track, index) {
+    setCurrent(track);
+    setCurrentIndex(index);
+  }
+
+  function handleNextTrack() {
+    if (tracks.length === 0) return;
+    let nextIndex;
+    if (isShuffle) {
+      // Pick a random track different from current
+      nextIndex = Math.floor(Math.random() * tracks.length);
+    } else {
+      nextIndex = (currentIndex + 1) % tracks.length;
+    }
+    setCurrentIndex(nextIndex);
+    setCurrent(tracks[nextIndex]);
+  }
+
+  function handlePreviousTrack() {
+    if (tracks.length === 0) return;
+    const prevIndex = currentIndex <= 0 ? tracks.length - 1 : currentIndex - 1;
+    setCurrentIndex(prevIndex);
+    setCurrent(tracks[prevIndex]);
   }
 
   return (
@@ -34,11 +63,11 @@ function Home() {
 
       <main className="main-content">
         <div className="track-grid">
-          {tracks.map((track) => (
+          {tracks.map((track, index) => (
             <div
               key={track.id}
               className="track-card"
-              onClick={() => setCurrent(track)}
+              onClick={() => handleSelectTrack(track, index)}
             >
               <div className="track-image-container">
                 <img src={track.image} alt={track.name} />
@@ -52,7 +81,17 @@ function Home() {
         </div>
       </main>
 
-      {current && <Player track={current} />}
+      {current && (
+        <Player
+          track={current}
+          onNext={handleNextTrack}
+          onPrevious={handlePreviousTrack}
+          onShuffleChange={setIsShuffle}
+          isShuffle={isShuffle}
+          hasNextTrack={currentIndex < tracks.length - 1 || tracks.length > 1}
+          hasPreviousTrack={currentIndex > 0 || tracks.length > 1}
+        />
+      )}
     </div>
   );
 }
