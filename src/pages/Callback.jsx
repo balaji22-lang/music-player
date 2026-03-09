@@ -11,7 +11,7 @@ function Callback() {
   }, []);
 
   async function getToken(code) {
-    // Jamendo token exchange
+
     const body = new URLSearchParams({
       grant_type: "authorization_code",
       client_id: "c00a33ea",

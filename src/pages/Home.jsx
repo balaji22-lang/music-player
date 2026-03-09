@@ -10,8 +10,6 @@ function Home() {
   const [currentIndex, setCurrentIndex] = useState(-1);
   const [isShuffle, setIsShuffle] = useState(false);
 
-  // Note: Jamendo public track API doesn't require an OAuth token, just your client_id!
-  // so we can bypass the login check completely.
 
   async function handleSearch() {
     const results = await searchSongs(query);
@@ -29,7 +27,7 @@ function Home() {
     if (tracks.length === 0) return;
     let nextIndex;
     if (isShuffle) {
-      // Pick a random track different from current
+      
       nextIndex = Math.floor(Math.random() * tracks.length);
     } else {
       nextIndex = (currentIndex + 1) % tracks.length;
