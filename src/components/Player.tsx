@@ -1,58 +1,78 @@
-import { useRef, useState } from "react";
+import { useRef, useState } from 'react'
 
-function Player({ track, onNext, onPrevious, onShuffleChange, isShuffle, hasNextTrack, hasPreviousTrack }) {
-  const audioRef = useRef();
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [isLooping, setIsLooping] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
+import { Track } from '../types/spotify'
 
-  if (!track) return null;
+interface PlayerProps {
+  track: Track
+  onNext: () => void
+  onPrevious: () => void
+  onShuffleChange: (isShuffle: boolean) => void
+  isShuffle: boolean
+  hasNextTrack: boolean
+  hasPreviousTrack: boolean
+}
+
+function Player({
+  track,
+  onNext,
+  onPrevious,
+  onShuffleChange,
+  isShuffle,
+  hasNextTrack,
+  hasPreviousTrack,
+}: PlayerProps) {
+  const audioRef = useRef<any>(null)
+  const [isPlaying, setIsPlaying] = useState(true)
+  const [isLooping, setIsLooping] = useState(false)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
 
   const togglePlay = () => {
     if (isPlaying) {
-      audioRef.current?.pause();
+      audioRef.current?.pause()
     } else {
-      audioRef.current?.play();
+      audioRef.current?.play()
     }
-    setIsPlaying(!isPlaying);
-  };
+    setIsPlaying(!isPlaying)
+  }
 
   const toggleLoop = () => {
-    setIsLooping(!isLooping);
+    setIsLooping(!isLooping)
     if (audioRef.current) {
-      audioRef.current.loop = !isLooping;
+      audioRef.current.loop = !isLooping
     }
-  };
+  }
 
   const handleTimeUpdate = () => {
-    setCurrentTime(audioRef.current?.currentTime || 0);
-  };
+    setCurrentTime(audioRef.current?.currentTime || 0)
+  }
 
   const handleLoadedMetadata = () => {
-    setDuration(audioRef.current?.duration || 0);
-  };
+    setDuration(audioRef.current?.duration || 0)
+  }
 
   const handleEnded = () => {
-    if (!isLooping && onNext) {
-      onNext();
+    if (!isLooping) {
+      onNext()
     }
-  };
+  }
 
-  const formatTime = (seconds) => {
-    if (!seconds || isNaN(seconds)) return "0:00";
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
-  };
+  const formatTime = (seconds: number) => {
+    if (!seconds || Number.isNaN(seconds)) return '0:00'
+    const mins = Math.floor(seconds / 60)
+    const secs = Math.floor(seconds % 60)
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`
+  }
 
-  const handleProgressChange = (e) => {
-    const newTime = (e.target.value / 100) * duration;
-    audioRef.current.currentTime = newTime;
-    setCurrentTime(newTime);
-  };
+  const handleProgressChange = (event: any) => {
+    const newTime = (Number(event.target.value) / 100) * duration
+    if (audioRef.current) {
+      audioRef.current.currentTime = newTime
+    }
+    setCurrentTime(newTime)
+  }
 
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const progress = duration > 0 ? (currentTime / duration) * 100 : 0
 
   return (
     <div className="player-container">
@@ -108,10 +128,10 @@ function Player({ track, onNext, onPrevious, onShuffleChange, isShuffle, hasNext
             onClick={togglePlay}
             title={isPlaying ? "Pause" : "Play"}
           >
-            <img 
-              src={isPlaying ? "/pause.png" : "/play-button-arrowhead.png"} 
-              alt={isPlaying ? "Pause" : "Play"} 
-              className="btn-icon play-icon" 
+            <img
+              src={isPlaying ? "/pause.png" : "/play-button-arrowhead.png"}
+              alt={isPlaying ? "Pause" : "Play"}
+              className="btn-icon play-icon"
             />
           </button>
           <button
@@ -132,7 +152,7 @@ function Player({ track, onNext, onPrevious, onShuffleChange, isShuffle, hasNext
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-export default Player;
+export default Player

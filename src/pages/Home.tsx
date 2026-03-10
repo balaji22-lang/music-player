@@ -1,46 +1,51 @@
-import { useState } from "react";
+import { useState } from 'react'
 
-import { searchSongs } from "../services/spotify";
-import Player from "../components/Player";
+import Player from '../components/Player'
+import { searchSongs } from '../services/spotify'
+import { Track } from '../types/spotify'
 
 function Home() {
-  const [query, setQuery] = useState("");
-  const [tracks, setTracks] = useState([]);
-  const [current, setCurrent] = useState(null);
-  const [currentIndex, setCurrentIndex] = useState(-1);
-  const [isShuffle, setIsShuffle] = useState(false);
-
+  const [query, setQuery] = useState('')
+  const [tracks, setTracks] = useState<Track[]>([])
+  const [current, setCurrent] = useState<Track | null>(null)
+  const [currentIndex, setCurrentIndex] = useState(-1)
+  const [isShuffle, setIsShuffle] = useState(false)
 
   async function handleSearch() {
-    const results = await searchSongs(query);
-    setTracks(results);
-    setCurrentIndex(-1);
-    setCurrent(null);
+    const results = await searchSongs(query)
+    setTracks(results)
+    setCurrentIndex(-1)
+    setCurrent(null)
   }
 
-  function handleSelectTrack(track, index) {
-    setCurrent(track);
-    setCurrentIndex(index);
+  function handleSelectTrack(track: Track, index: number) {
+    setCurrent(track)
+    setCurrentIndex(index)
   }
 
   function handleNextTrack() {
-    if (tracks.length === 0) return;
-    let nextIndex;
+    if (tracks.length === 0) return
+    let nextIndex = 0
     if (isShuffle) {
-      
-      nextIndex = Math.floor(Math.random() * tracks.length);
+      nextIndex = Math.floor(Math.random() * tracks.length)
     } else {
-      nextIndex = (currentIndex + 1) % tracks.length;
+      nextIndex = (currentIndex + 1) % tracks.length
     }
-    setCurrentIndex(nextIndex);
-    setCurrent(tracks[nextIndex]);
+    setCurrentIndex(nextIndex)
+    setCurrent(tracks[nextIndex])
   }
 
   function handlePreviousTrack() {
-    if (tracks.length === 0) return;
-    const prevIndex = currentIndex <= 0 ? tracks.length - 1 : currentIndex - 1;
-    setCurrentIndex(prevIndex);
-    setCurrent(tracks[prevIndex]);
+    if (tracks.length === 0) return
+    const prevIndex = currentIndex <= 0 ? tracks.length - 1 : currentIndex - 1
+    setCurrentIndex(prevIndex)
+    setCurrent(tracks[prevIndex])
+  }
+
+  function handleSearchKeyDown(event: any) {
+    if (event.key === 'Enter') {
+      handleSearch()
+    }
   }
 
   return (
@@ -53,7 +58,7 @@ function Home() {
             placeholder="Search for a song or artist..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            onKeyDown={handleSearchKeyDown}
           />
           <button onClick={handleSearch}>Search</button>
         </div>
@@ -91,7 +96,7 @@ function Home() {
         />
       )}
     </div>
-  );
+  )
 }
 
-export default Home;
+export default Home
